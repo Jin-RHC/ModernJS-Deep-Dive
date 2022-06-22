@@ -177,7 +177,7 @@ Array + ''          // -> "function Array() { [native code] }"
 +undefined // -> NaN
 
 // 심벌 타입
-+Symbol() // -> ypeError: Cannot convert a Symbol value to a number
++Symbol() // -> typeError: Cannot convert a Symbol value to a number
 
 // 객체 타입
 +{}             // -> NaN
@@ -218,7 +218,6 @@ if (null)  console.log('6');
 - `-0`
 - `NaN`
 - `''`(빈 문자열)
-- 
 
 ```js
  // 아래의 조건문은 모두 코드 블록을 실행한다.
@@ -381,7 +380,7 @@ false * 1;   // -> 0
 - `Boolean`생성자 함수를 `new`연산자 없이 호출하는 방법
 - `!`부정 논리 연산자를 두 번 사용하는 방법
 
-```
+```js
 // 1. Boolean 생성자 함수를 new 연산자 없이 호출하는 방법
 // 문자열 타입 => 불리언 타입
 Boolean('x');       // -> true
@@ -457,8 +456,8 @@ Boolean([]);        // -> true
 
 |  단축 평가 표현식   | 평가 결과 |
 | :-----------------: | :-------: |
-| `true`||`anything`  |   true    |
-| `false`||`anything` | anything  |
+| `true || anything` |true|
+| `false || anything` |anything|
 | `true && anything`  | anything  |
 | `false && anything` |   false   |
 
