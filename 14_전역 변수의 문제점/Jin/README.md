@@ -206,9 +206,9 @@ console.log(Counter.decrease()); // 0
 > ```js
 > const x = 1;
 > function outer() {
->    const x = 10;
->    const inner = function () { console.log(x); };
->    return inner;
+>        const x = 10;
+>        const inner = function () { console.log(x); };
+>        return inner;
 > }
 > 
 > const innerFunc = outer(); // outer 함수 호출하면 중첩함수 inner 반환
