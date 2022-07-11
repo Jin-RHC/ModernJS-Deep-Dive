@@ -229,3 +229,246 @@ const you = new MyClass(); // ReferenceError: MyClass is not defined
 ```
 
 - 이는 기명 함수 표현식과 마찬가지로 클래스 표현식에서 사용한 클래스 이름은 외부 코드에서 접근 불가능하기 때문이다.
+
+## 25.5 메서드
+
+- 클래스 몸체에는 0개 이상의 메서드만 선언할 수 있다.
+- 클래스 몸체에서 정의할 수 있는 메서드는 constructor(생성자), 프로토타입 메서드, 정적 메서드의 세 가지가 있다.
+
+### 25.5.1 constructor
+
+- **constructor**는 인스턴트를 생성하고 초기화하기 위한 특수한 메서드이며 이름을 변경할 수 없다.
+
+```jsx
+class Person {
+  // 생성자
+  constructor(name) {
+    // 인스턴스 생성 및 초기화
+    this.name = name;
+  }
+}
+```
+
+- 클래스는 인스턴스를 생성하기 위한 **생성자 함수**
+
+```jsx
+// 클래스는 함수다
+console.log(typeof Person); // function
+console.dir(Person);
+```
+
+- console.dir(Person)을 크롬 브라우저의 개발자 도구에서 실행해보면 function과 똑같다는 것을 알 수 있다.
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/5450574d-2bb5-45a3-9147-23007ba95f2e/Untitled.png)
+
+- 클래스가 생성한 인스턴스 내부
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/5448ebf5-fc25-42d7-b2f9-7504206c446b/Untitled.png)
+
+- **constructor** 내부에서 this에 추가한 name 프로퍼티가 클래스가 생성한 인스턴스의 프로퍼티로 추가된 것을 확인할 수 있다.
+
+```jsx
+class Person {
+  // 생성자
+  constructor() {
+    // 인스턴스 생성 및 초기화
+    this.name = name;
+  }
+}
+
+// 생성자 함수
+function Person(name) {
+  // 인스턴스 생성 및 초기화
+  this.name = name;
+}
+```
+
+- **this**가 아닌 다른 객체를 명시적으로 반환하면 **return**문의 객체가 반환된다.
+
+```jsx
+class Person {
+  // constructor는 생략하면 아래와 같이 빈 constructor가 암묵적으로 정의된다.
+  constructor() {}
+}
+
+// 빈 객체가 생성된다.
+const me = new Person();
+console.log(me); // Person {}
+```
+
+- 명시적으로 원시값을 반환하면 원시값은 무시되고 암묵적으로 this가 반환된다.
+
+```jsx
+class Person {
+  constructor(name) {
+    this.name = name;
+
+    // 명시적으로 원시값을 반환하면 원시값 반환은 무시되고 암묵적으로 this가 반환된다.
+    return 100;
+  }
+}
+
+const me = new Person('Lee');
+console.log(me); // Person { name: "Lee" }
+```
+
+- 이처럼 constructor 내부에서 명시적으로 this가 아닌 다른 값을 반환하는 것은 클래스의 기본동작을 훼손한다. ⇒ constructor 내부에서 **return 문을 반드시 생략**해야 한다.
+
+### 25.5.2 프로토타입 메서드
+
+- 생성자 함수를 사용해서 인스턴스를 생성하는 경우, 프로토타입 메서드를 생성하기 위해서는 프로토타입 메서드를 명시적으로 추가해야한다.
+
+```jsx
+// 생성자 함수
+function Person(name) {
+  this.name = name;
+}
+
+// 프로토타입 메서드
+Person.prototype.sayHi = function () {
+  console.log(`Hi! My name is ${this.name}`);
+};
+
+const me = new Person('Lee');
+me.sayHi(); // Hi! My name is Lee
+```
+
+- 클래스 몸체에서 정의한 메서드는 prototype 프로퍼티에 메서드를 추가하지 않아도 기본적으로 프로토타입 메서드가 된다.
+- 클래스가 생성한 인스턴스는 프로토타입 체인의 일원이 된다.
+
+```jsx
+// 생성자 함수
+class Person {
+// 생성자
+  function Person(name) {
+    this.name = name;
+  }
+
+  // 프로토타입 메서드
+  sayHi() {
+    console.log(`Hi! My name is ${this.name}`);
+  }
+}
+
+const me = new Person('Lee')
+me.sayHi(); // Hi! My name is Lee
+```
+
+- Person클래스는 프로토타입 체인을 생성하여 프로토타입 메서드가 된다.
+- 모든 객체 생성 방식뿐만아니라 클래스에 의해 생성된 인스턴스에도 동일하게 적용된다.
+
+### 25.5.3 정적 메서드
+
+> **19.12** **"정적 프로퍼티/메서드"**
+> 정적(static) 메서드는 인스턴스를 생성하지 않아도 호출할 수 있는 메서드를 말한다
+
+- 클래스에서는 메서드에 static 키워드를 붙이면 정적 메서드(클래스 메서드)가 된다.
+- 정적 메서드는 인스턴스로 호출할 수 없다 ⇒ 정적 메서드가 바인딩된 클래스는 인스턴스의 프로토타입 체인상에 존재하지 않기 때문이다.
+
+```jsx
+class Person {
+  // 생성자
+  constructor(name) {
+    // 인스턴스 생성 및 초기화
+    this.name = name;
+  }
+
+  // 정적 메서드
+  static sayHi() {
+    console.log('Hi!');
+  }
+}
+
+// 정적 메서드는 클래스로 호출한다.
+// 정적 메서드는 인스턴스 없이도 호출할 수 있다.
+Person.sayHi(); // Hi!
+
+// 인스턴스 생성
+const me = new Person('Lee');
+me.sayHi(); // 타입 에러
+```
+
+### 25.5.4 정적 메서드와 프로토타입 메서드의 차이
+
+```
+1. 정적 메서드와 프로토타입 메서드는 자신이 속해 있는 포로토타입 체인이 다른다.
+2. 정적 메서드는 클래스로 호출하고 프로토타입 메서드는 인스턴스로 호출한다.
+3. 정적 메서드는 인스턴스 프로퍼티를 참조할 수 없지만 프로토타입 메서드는 인스턴스 프로퍼티를 참조할 수 있다.
+```
+
+```jsx
+class Square {
+  // 정적 메서드
+  static area(width, height) {
+    return width * height;
+  }
+}
+
+console.log(Square.area(10, 10)); // 100;
+```
+
+- 정적 메서드 area는 2개의 인수를 전달받아 면적을 계산하는데 인스턴스 프로퍼티를 참조하지 않는다.
+- 만약 인스턴스 프로퍼티를 참조해야 한다면 프로토타입 메서드를 사용해야 한다.
+
+```jsx
+class Square {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+
+  // 프로토타입 메서드
+  area() {
+    return this.width * this.height;
+  }
+}
+
+const square = new Square(10, 10);
+console.log(Square.area()); // 100;
+```
+
+- 메서드 내부의 this는 메서드를 소유한 객체가 아니라 메서드를 호출한 객체, 즉 메서드 이름 앞의 마침표(.) 연산자 앞에 기술한 객체에 바인딩된다.
+- 위 예제의 경우 square 객체로 프로토타입 메서드 area를 호출했기 떄문에 area 내부의 this는 square 객체를 가리킨다.
+
+### 25.5.5 클래스에서 정의한 메서드의 특징
+
+```
+1. function 키워드를 생략한 메서드 축약 표현을 사용한다.
+2. 객체 리터럴과는 다르게 클래스에서 메서드를 정의할 때는 콤마가 필요 없다.
+3. 암묵적으로 strict mode로 실행된다.
+4. for...in 문이나 Object.keys 메서드 등으로 열거할 수 없다. 즉, 프로퍼티의 열거 가능 여부를 나타내며, 불리언 값을 갖는 프로퍼티 어트리뷰트 [[Enumerable]]의 값이 false다.
+5. 내부 메서드 [[Construct]]를 갖지 않는 non-constructor다. 따라서 new 연산자와 함께 호출할 수 없다.
+```
+
+## 25.6 클래스의 인스턴스 생성과정
+
+- new 연산자와 함께 클래스를 호출하면 생성자 함수와 마찬가지로 내부 매서드 [[Construct]]가 호출된다. (new 연산자 없이 호출 X!)
+- 생성자 함수와 비슷하게 인스턴스가 생성된다.
+
+### **생성 과정**
+
+1. **인스턴스 생성과 this 바인딩**
+   - `new`연산자와 함께 클래스를 호출하면 constructor의 내부 코드가 실행되기에 앞서 암묵적으로 빈 객체가 생성된다. 빈 객체 ⇒ 클래스가 생성한 인스턴스
+   - 암묵적으로 생성된 빈 객체(인스턴스)는 this에 바인딩 된다.
+   - **constructor** 내부의 `this`는 클래스가 생성한 인스턴스를 가리킨다.
+2. **인스턴스 초기화**
+   - **constructor**의 내부 코드가 실행되어 `this`에 바인딩되어 있는 **인스턴스를 초기화**한다.
+   - `this`에 바인딩 되어있는 인스턴스에 프로퍼티를 추가하고 **constructor**가 인수로 전달받은 초기값으로 인스턴스의 프로퍼티 값을 초기화한다.
+3. **인스턴스 반환**
+   - 모든 처리가 끝나면 완성된 인스턴스가 바인딩된 `this`가 암묵적으로 반환된다.
+
+```jsx
+class Person {
+  // 생성자
+  constructor(name) {
+    // 1. 암묵적으로 인스턴스가 생성되고 this에 바인딩된다.
+    console.log(this); // Person {}
+    console.log(Object.getPrototypeOf(this) === Person.prototype); // true
+
+    // 2. this에 바인딩되어 있는 인스턴스를 초기화한다.
+    this.name = name;
+
+    // 3. 완성된 인스턴스가 바인딩 된 this가 암묵적으로 반환된다.
+  }
+}
+```
