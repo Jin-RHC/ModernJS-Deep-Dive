@@ -472,3 +472,229 @@ class Person {
   }
 }
 ```
+
+## 25.7 프로퍼티
+
+### 25.7.1 인스턴스 프로퍼티
+
+- 인스턴스 프로퍼티는 constructor 내부에서 정의해야한다.
+
+```jsx
+class Person {
+  constructor(name) {
+    // 인스턴스 프로퍼티
+    this.name = name; // name 프로퍼티는 public 하다.
+  }
+}
+
+const me = new Person('Lee');
+
+console.log(me.name); // Lee
+```
+
+- this에 인스턴스 프로퍼티를 추가한다.
+
+### 25.7.2 접근자 프로퍼티
+
+- **접근자 프로퍼티**는 **자체적으로는 값을 갖지 않고** 프로퍼티 **값**을 **읽거나 저장**할 때 사용하는 **접근자 함수로 구성된 프로퍼티**다.
+
+- 객체 리터럴로 표현한 모습
+
+```jsx
+// 객체 릭터럴
+const person = {
+  firstName: 'Sanghyeon',
+  lastName: 'Lee',
+
+  // getter 함수
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  },
+  // setter 함수
+  set fullName() {
+    [this.fristName, this.lastName] = name.split(' ');
+  }
+};
+```
+
+- 클래스로 표현한 모습
+
+```jsx
+class Person {
+  constructor(firstName, lastName) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+
+  // getter 함수
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  // setter 함수
+  set fullName() {
+    [this.fristName, this.lastName] = name.split(' ');
+  }
+}
+
+const me = new Person('Sanghyeon', 'Lee');
+
+// setter 함수 호출
+me.fullName = 'Heegun Lee';
+
+// getter 함수 호출
+console.log(me.fullName);
+```
+
+-
+
+### 25.7.3 클래스 필드 정의 제안
+
+- 클래스 필드 정의 ⇒ 클래스가 생성할 인스턴스 프로퍼티를 가르키는 용어, 내부에서 변수처럼 사용가능
+- 자바스크립트 클래스에서 인스턴스 프로퍼티를 선언하고 초기화하려면 반드시 constructor 내부에 this에 프로퍼티를 추가해야한다.
+- 참조도 마찬가지로 this를 사용하여 참조해야 한다.
+- 원래는 클래스 몸체에 메서드만 선언이 가능하고 클래스 필드를 선언하면 SyntaxError가 발생했지만, 최신 버전에서는 정상적으로 작동한다. ⇒ 새 표준인 ‘**class field declarations**’, 인스턴스 프로퍼티를 마치 클래스 기반 객체지향 언어의 클래스 필드처럼 정의 가능
+
+```jsx
+class Person {
+  // 클래스 필드 정의
+  name = 'Lee';
+}
+
+const me = new Person();
+console.log(me); // Person {name: "Lee"}
+```
+
+- 몸체에서 클래스 필드를 정의하는 경우는 this에 클래스 필드를 바인딩해서는 안된다. ⇒ this는 클래스의 constructor와 메서드 내에서만 유효하다.
+
+```jsx
+class Person{
+	this.name = ''; //SyntaxError
+}
+```
+
+- 클래스 필드를 참조하는 경우에 반드시 this를 사용해야함.
+
+```jsx
+class Person {
+  name = 'merry';
+
+  constructor() {
+    console.log(name); // ReferenceError
+  }
+}
+```
+
+- 클래스 필드에 초기값을 할당하지 않으면 undefined를 갖는다.
+
+```jsx
+class Person {
+  name;
+}
+
+const me = new Person();
+console.log(me); // Person {name: undefined}
+```
+
+- 인스턴스를 생성할 때 외부의 초기값으로 초기화 해야하면 constructor에서 클래스 필드를 초기화 해야한다.
+- 함수는 일급객체이므로 함수를 클래스 필드에 할당 가능 ⇒ 클래스 필드를 통해서 메서드를 정의할 수 있다.
+
+```jsx
+class Person {
+  name = 'Lee';
+
+  getName = function () {
+    return this.name;
+  };
+  // 화살표 함수로도 정의 가능
+  // getName = () => this.name;
+}
+
+const me = new Person();
+console.log(me); // Person {name: 'Lee', getName: f}
+console.log(me.getNmae()); // Lee
+```
+
+- 클래스 필드에 함수를 할당하는 경우에는 프로토타입 메서드가 아닌 인스턴스 메서드가 된다. ⇒ 모든 클래스 필드는 인스턴스 프로퍼티가 되기 때문! ⇒ **클래스 필드에 함수를 할당하는 것은 권장 X**
+
+### **인스턴스 프로퍼티를 정의하는 방식**
+
+1. `constructor`**에서 인스턴스 프로퍼티를 정의** : 외부 초기값으로 클래스필드를 초기화 해야한다면!
+2. **클래스 필드 정의** : 외부 초기값으로 클래스 필드를 초기화 할 필요 없다면 가능
+
+### 25.7.4 private 필드 정의 제안
+
+- 자바스크립트는 캡슐화를 완전하게 지원하지 않음
+- 다른 클래스 기반 `private`, `public` 등 키워드를 지원하지 않고 언제나 `public` 으로 제공
+- 하지만 현재 `private` 필드를 정의할 수 있는 새로운 표준 사양이 제안되어 있다.
+- 최신 브라우저와 최신 `Node.js`에서 이미 구현되어 있다.
+
+```jsx
+class Person {
+  // private 필드 정의
+  #name = '';
+
+  constructor(name) {
+    // private 필드 참조
+    this.name = #name;
+  }
+}
+
+const me = new Person('merry');
+console.log(me.#name); // SyntaxError
+```
+
+**Typescript** - `public`, `private`, `protected` 모두 지원하며 같은 의미로 사용가능하다.
+
+| 접근 가능성                 | public | private |
+| --------------------------- | ------ | ------- |
+| 클래스 내부                 | O      | O       |
+| 자식 클래스 내부            | O      | X       |
+| 클래스 인스턴스를 통한 접근 | O      | X       |
+
+- `private`필드는 클래스 내부에서만 참조할 수 있지만 접근자 프로퍼티를 통해서 간접적으로 접근은 가능하다.
+
+```jsx
+class Person {
+  // private 필드 정의
+  #name = '';
+
+  constructor(name) {
+    // private 필드 참조
+    this.name = #name;
+  }
+
+  get name() {
+    return this.#name;
+  }
+}
+
+const me = new Person('merry');
+console.log(me.name); // merry
+```
+
+- `private` 필드는 반드시 클래스 몸체에 정의해야 한다.
+- `constructor`에서 정의하면 에러가 발생한다.
+
+### 25.7.5 static 필드 정의 제안
+
+- static 키워드를 사용하여 정적 메서드를 정의할 수 있었지만 정적 필드는 정의할 수 없다.
+- 새로운 표준 사양인 **Static class features**가 나온 후 static public/private 필드가 구현되어 있다.
+
+```jsx
+class MyMath {
+  // static public 필드 정의
+  static PI = 22 / 7;
+
+  // static private 필드 정의
+  static #num = 10;
+
+  // static 메서드
+  static increment() {
+    return ++MyMath.#num;
+  }
+}
+
+console.log(MyMath.PI); // 3.142857142857143
+console.log(MyMath.increment()); // 11
+```
