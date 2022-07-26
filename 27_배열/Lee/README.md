@@ -1230,6 +1230,56 @@ users.find((user) => user.id === 2); // -> {id: 2, name: 'Kim'}
 
 - find 메서드는 콜백 함수의 반환값이 true인 첫 번째 요소를 반환하므로 find의 결과값은 배열이 아닌 해당 **요소(element)값**이다.
 
-### 27.9.9 Array.prototype.findInext
+### 27.9.9 Array.prototype.findIndex
+
+- ES6에서 도입된 findIndex 메서드는 자신이 호출한 배열의 요소를 순회하면서 인수로 전달된 콜백 함수를 호출하여 반환값이 true인 첫번째 요소의 인덱스를 반환한다.
+- true인 요소가 존재하지 않는다면 -1을 반환한다.
+
+```jsx
+const users = [
+  { id: 1, name: 'Lee' },
+  { id: 2, name: 'Kim' },
+  { id: 3, name: 'Choi' },
+  { id: 4, name: 'Park' },
+];
+
+// id가 2인 요소의 인덱스를 구한다.
+users.findIndex((user) => user.id === 2); // 1
+
+// name이 'Park'인 요소의 인덱스를 구한다.
+users.findIndex((user) => user.name === 'Park'); // 3
+
+// 프로퍼티 키와 프로퍼티 값으로 요소 인덱스를 구하는 경우
+// 다음과 같이 콜백 함수를 추상화할 수 있다.
+function predicate(key, value) {
+  //key와 value를 기억하는 클로저를 반환
+  return (item) => item[key] == value;
+}
+
+// id가 2인 요소의 인덱스를 구한다.
+users.findIndex(predicate('id', 2)); // 1
+
+// name이 'Park'인 요소의 인덱스를 구한다.
+users.findIndex(predicate('name', 'Park')); // 3
+```
 
 ### 27.9.10 Array.prototype.flatMap
+
+- ES10에서 도입된 flatMap메서드는 map을 통해 새로 생성된 배열을 평탄화한다.
+- map메서드와 flat메서드를 순차적으로 실행하는 효과가 있다.
+
+```jsx
+const arr = ['hello', 'world'];
+
+//map과 flat을 순차적으로 실행
+arr.map(x => x.split('')).flat());
+// => ['h','e','l','l','o','w','o','r','l','d']
+
+//flatMap은 map을 통해 생성된 새로운 배열을 평탄화한다.
+arr.flatMap(x => x.split(''));
+// => ['h','e','l','l','o','w','o','r','l','d']
+
+```
+
+- 단 flatMap 메서드는 1단계만 평탄화한다.
+- 평탄화 깊이를 지정해야한다면 map 메서드랑 flat 메서드를 각각 호출해야한다.
